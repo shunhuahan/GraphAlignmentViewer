@@ -29,6 +29,7 @@ from collections import defaultdict
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import os.path
 import numpy as np
 import pysam
 
@@ -419,13 +420,20 @@ def plot_pileup(repeat_id, pileup_list, genotypes, reference_graph, greyscale=Fa
     for site_pileup in pileup_list:
         ylen += 3.5 + 3.5 * len(set([str(align[2]) for align in site_pileup[2]])) + len(site_pileup[2])
     
-    
     xscale = 1.0 / 10
     yscale = 2.0 / 10
     fontsize = 8
     margin = 0.5
-    fig = plt.figure(figsize=(xlen * xscale + 2 *
-                                margin,  ylen * yscale + 2 * margin))
+    xsize = xlen * xscale + 2 * margin
+    ysize = ylen * yscale + 2 * margin
+    print("locus name: " + repeat_id)
+    if xsize * dpi > 65536:
+        print("figure width exceed 2^16 pixels for locus: " + repeat_id)
+        return
+    if ysize * dpi > 65536:
+        print("figure height exceed 2^16 pixels for locus: " + repeat_id)
+        return
+    fig = plt.figure(figsize=(xsize,  ysize))
     if title_prefix == "":
         fig.suptitle("%s:%s" % (repeat_id, reference_graph.locus_structure), fontsize=4 * fontsize, y=1 - margin / (ylen * yscale + 2 * margin), va='bottom')
     else:
